@@ -46,7 +46,18 @@ openconnect_start()
 {
         echo "starting openconnect"
 	/usr/local/sbin/openconnect ${openconnect_flags} < /usr/local/etc/openconnect.secret 2>&1 > /dev/null
-        sleep 5
+
+        # Wait for vpnc-script to configure the tunnel address before renaming
+        # the interface. A fixed sleep is not enough for the Fortinet protocol:
+        # there the script runs only after the PPP negotiation, possibly later
+        # than 5 seconds. Renaming too early leaves the tunnel without an
+        # address and makes every "route add" fail with "Invalid argument".
+        i=0
+        while [ $i -lt 30 ] && ! ifconfig tun30000 2>/dev/null | grep -q 'inet '; do
+            sleep 1
+            i=$((i + 1))
+        done
+
         ifconfig ocvpn0 destroy 2>/dev/null
 	ifconfig tun30000 name ocvpn0
 	ifconfig ocvpn0 group ocvpn
