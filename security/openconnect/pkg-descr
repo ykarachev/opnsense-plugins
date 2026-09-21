@@ -10,6 +10,7 @@ Plugin Changelog
 
 * Add otion to allow insecure ciphers
 * Clean up stale interface on start (contributed by Yuriy Karachev)
+* Rename the tunnel interface after vpnc-script finished (contributed by Yuriy Karachev)
 
 1.4.5
 
